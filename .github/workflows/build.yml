@@ -6,12 +6,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
-          
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -20,12 +20,11 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Dependencies
-        # This --filter command tells pnpm to only focus on the client app
-        run: pnpm install --filter client... --no-frozen-lockfile
-
-      - name: Build Web App
-        run: npx nx build client
+      - name: Install & Build Web App
+        working-directory: apps/client
+        run: |
+          pnpm install --no-frozen-lockfile --ignore-workspace
+          pnpm run build
         env:
           NODE_ENV: production
 
@@ -35,5 +34,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: apps/client
-          tagName: v1.0.4
+          tagName: v1.0.6
           releaseName: "Local Offline Build"
