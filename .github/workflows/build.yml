@@ -6,27 +6,35 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
-
+          
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22 # Updated to fix the "Unsupported engine" error
+          cache: 'pnpm'
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install & Build Web App
-        working-directory: apps/client
+      - name: Install Dependencies
+        # Added --ignore-scripts to skip the Prisma/Database setup we don't need for an EXE
         run: |
-          pnpm install --no-frozen-lockfile --ignore-workspace
-          pnpm run build
+          cd apps/client
+          pnpm install --no-frozen-lockfile --ignore-scripts
+
+      - name: Build Web App
+        # We use 'next build' directly to avoid the workspace/nx overhead
+        run: |
+          cd apps/client
+          npx next build
         env:
           NODE_ENV: production
+          NEXT_PUBLIC_BASE_URL: http://localhost:3000
 
       - name: Build Tauri EXE
         uses: tauri-apps/tauri-action@v0
@@ -34,5 +42,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: apps/client
-          tagName: v1.0.7
+          tagName: v1.0.6
           releaseName: "Local Offline Build"
