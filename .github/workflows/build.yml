@@ -1,0 +1,29 @@
+name: Build Desktop EXE
+on: [workflow_dispatch] # Allows you to run it manually
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install Dependencies
+        run: npm install
+      - name: Initialize Tauri
+        run: |
+          npx tauri init --ci --window-title "Reactive Resume" --dist-dir "../out" --dev-path "http://localhost:3000"
+      - name: Build Static Site
+        run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_URL: http://localhost:3000
+      - name: Build Tauri EXE
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v1.0.0
+          releaseName: "Local Offline Build"
