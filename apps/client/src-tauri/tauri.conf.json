@@ -10,15 +10,26 @@
     "version": "0.1.0"
   },
   "tauri": {
-    "allowlist": { "all": true },
+    "allowlist": {
+      "all": true
+    },
     "bundle": {
       "active": true,
       "targets": ["msi", "exe"],
       "identifier": "com.reactive.resume",
       "icon": []
     },
+    "security": {
+      "csp": null
+    },
     "window": [
-      { "fullscreen": false, "height": 800, "resizable": true, "title": "Reactive Resume", "width": 1000 }
+      {
+        "fullscreen": false,
+        "height": 800,
+        "resizable": true,
+        "title": "Reactive Resume - Offline",
+        "width": 1000
+      }
     ]
   }
 }
