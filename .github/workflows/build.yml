@@ -21,15 +21,11 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Dependencies
-        # We are moving into the client folder to avoid the workspace error
-        run: |
-          cd apps/client
-          pnpm install --no-frozen-lockfile
+        # This --filter command tells pnpm to only focus on the client app
+        run: pnpm install --filter client... --no-frozen-lockfile
 
       - name: Build Web App
-        run: |
-          cd apps/client
-          pnpm run build
+        run: npx nx build client
         env:
           NODE_ENV: production
 
@@ -39,5 +35,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: apps/client
-          tagName: v1.0.3
+          tagName: v1.0.4
           releaseName: "Local Offline Build"
