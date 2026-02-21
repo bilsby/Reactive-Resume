@@ -15,20 +15,23 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22 # Updated to fix the "Unsupported engine" error
-          cache: 'pnpm'
+          node-version: 22
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Force Standalone Mode
+        # This deletes the files that are causing the "Workspace" error
+        run: |
+          rm pnpm-workspace.yaml
+          rm pnpm-lock.yaml
+
       - name: Install Dependencies
-        # Added --ignore-scripts to skip the Prisma/Database setup we don't need for an EXE
         run: |
           cd apps/client
           pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Build Web App
-        # We use 'next build' directly to avoid the workspace/nx overhead
         run: |
           cd apps/client
           npx next build
@@ -42,5 +45,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: apps/client
-          tagName: v1.0.6
+          tagName: v1.0.7
           releaseName: "Local Offline Build"
